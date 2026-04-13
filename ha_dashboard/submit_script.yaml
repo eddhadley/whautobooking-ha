@@ -1,67 +1,50 @@
 # ─────────────────────────────────────────────────────────
 # Script: Submit Booking from Dashboard Helpers
 # ─────────────────────────────────────────────────────────
-# Add this to your configuration.yaml under the `script:` key,
-# or create it via Settings → Scripts → Add Script (YAML mode).
+# Create via Settings → Automations & Scenes → Scripts → Add Script
+# Click ⋮ → Edit in YAML, then paste the sequence block.
+#
+# SCRIPT 1: esp_submit_booking
+# ─────────────────────────────────────────────────────────
+# alias: Submit Padel Booking
+# icon: mdi:tennis
+# Paste this sequence:
 
-script:
-  esp_submit_booking:
-    alias: "Submit Padel Booking"
-    icon: mdi:tennis
-    description: "Reads the dashboard input helpers and calls esp_booker.add_booking"
-    sequence:
-      - service: esp_booker.add_booking
-        data:
-          date: >-
-            {{ states('input_datetime.esp_booking_date') | as_datetime | as_local
-               | strftime('%d/%m/%y') }}
-          time: >-
-            {{ state_attr('input_datetime.esp_booking_time', 'timestamp')
-               | int | timestamp_custom('%H:%M', false) }}
-          court: "{{ states('input_select.esp_booking_court') }}"
-          duration_mins: "{{ states('input_select.esp_booking_duration') | int }}"
-          num_people: "{{ states('input_number.esp_booking_people') | int }}"
-      - service: persistent_notification.create
-        data:
-          title: "Booking Submitted"
-          message: >-
-            {{ states('input_select.esp_booking_court') }} on
-            {{ states('input_datetime.esp_booking_date') }}
-            at {{ state_attr('input_datetime.esp_booking_time', 'timestamp')
-                  | int | timestamp_custom('%H:%M', false) }}
-            ({{ states('input_select.esp_booking_duration') }} mins,
-             {{ states('input_number.esp_booking_people') | int }} people)
+sequence:
+  - service: esp_booker.add_booking
+    data:
+      date: "{{ states('input_datetime.esp_booking_date') | as_datetime | as_local | strftime('%d/%m/%y') }}"
+      time: "{{ state_attr('input_datetime.esp_booking_time', 'timestamp') | int | timestamp_custom('%H:%M', false) }}"
+      court: "{{ states('input_select.esp_booking_court') }}"
+      duration_mins: "{{ states('input_select.esp_booking_duration') | int }}"
+      num_people: "{{ states('input_number.esp_booking_people') | int }}"
+  - service: persistent_notification.create
+    data:
+      title: "Booking Submitted"
+      message: "{{ states('input_select.esp_booking_court') }} on {{ states('input_datetime.esp_booking_date') }} at {{ state_attr('input_datetime.esp_booking_time', 'timestamp') | int | timestamp_custom('%H:%M', false) }} ({{ states('input_select.esp_booking_duration') }} mins, {{ states('input_number.esp_booking_people') | int }} people)"
 
-  esp_book_now:
-    alias: "Book Now (Immediate)"
-    icon: mdi:lightning-bolt
-    description: "Adds a booking and immediately triggers the booking run"
-    sequence:
-      - service: esp_booker.add_booking
-        data:
-          date: >-
-            {{ states('input_datetime.esp_booking_date') | as_datetime | as_local
-               | strftime('%d/%m/%y') }}
-          time: >-
-            {{ state_attr('input_datetime.esp_booking_time', 'timestamp')
-               | int | timestamp_custom('%H:%M', false) }}
-          court: "{{ states('input_select.esp_booking_court') }}"
-          duration_mins: "{{ states('input_select.esp_booking_duration') | int }}"
-          num_people: "{{ states('input_number.esp_booking_people') | int }}"
-      - delay:
-          seconds: 1
-      - service: esp_booker.book_now
-        data:
-          date: >-
-            {{ states('input_datetime.esp_booking_date') | as_datetime | as_local
-               | strftime('%d/%m/%y') }}
-      - service: persistent_notification.create
-        data:
-          title: "Booking Triggered"
-          message: >-
-            Immediate booking attempted for
-            {{ states('input_select.esp_booking_court') }} on
-            {{ states('input_datetime.esp_booking_date') }}
-            at {{ state_attr('input_datetime.esp_booking_time', 'timestamp')
-                  | int | timestamp_custom('%H:%M', false) }}.
-            Check the booking status for results.
+
+# ─────────────────────────────────────────────────────────
+# SCRIPT 2: esp_book_now
+# ─────────────────────────────────────────────────────────
+# alias: Book Now (Immediate)
+# icon: mdi:lightning-bolt
+# Paste this sequence:
+
+sequence:
+  - service: esp_booker.add_booking
+    data:
+      date: "{{ states('input_datetime.esp_booking_date') | as_datetime | as_local | strftime('%d/%m/%y') }}"
+      time: "{{ state_attr('input_datetime.esp_booking_time', 'timestamp') | int | timestamp_custom('%H:%M', false) }}"
+      court: "{{ states('input_select.esp_booking_court') }}"
+      duration_mins: "{{ states('input_select.esp_booking_duration') | int }}"
+      num_people: "{{ states('input_number.esp_booking_people') | int }}"
+  - delay:
+      seconds: 1
+  - service: esp_booker.book_now
+    data:
+      date: "{{ states('input_datetime.esp_booking_date') | as_datetime | as_local | strftime('%d/%m/%y') }}"
+  - service: persistent_notification.create
+    data:
+      title: "Booking Triggered"
+      message: "Immediate booking attempted for {{ states('input_select.esp_booking_court') }} on {{ states('input_datetime.esp_booking_date') }} at {{ state_attr('input_datetime.esp_booking_time', 'timestamp') | int | timestamp_custom('%H:%M', false) }}. Check the booking status for results."
