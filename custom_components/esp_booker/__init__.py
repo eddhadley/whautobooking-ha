@@ -13,7 +13,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.event import async_track_time_change
-from homeassistant.components.frontend import add_extra_js_url
 
 from .const import (
     DOMAIN,
@@ -167,13 +166,17 @@ def _register_services(hass: HomeAssistant) -> None:
 
 def _register_frontend_card(hass: HomeAssistant) -> None:
     """Register the custom Lovelace card JS as a frontend resource."""
+    from homeassistant.components.frontend import add_extra_js_url
+    from homeassistant.components.http import StaticPathConfig
+
     url = "/esp_booker/esp-booker-card.js"
+    path = str(Path(__file__).parent / "www" / "esp-booker-card.js")
 
     # Serve the JS file from the www folder
-    hass.http.register_static_path(
-        url,
-        str(Path(__file__).parent / "www" / "esp-booker-card.js"),
-        cache_headers=False,
+    hass.async_create_task(
+        hass.http.async_register_static_paths(
+            [StaticPathConfig(url, path, cache_headers=False)]
+        )
     )
 
     # Auto-load the JS in the frontend
