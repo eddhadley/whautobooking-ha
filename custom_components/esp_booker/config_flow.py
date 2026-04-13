@@ -7,8 +7,9 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
+from homeassistant.core import callback
 
 from .const import (
     DOMAIN,
@@ -62,6 +63,12 @@ class ESPBookerConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Return the options flow handler."""
+        return ESPBookerOptionsFlow(config_entry)
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -90,3 +97,43 @@ class ESPBookerConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=STEP_USER_DATA_SCHEMA,
             errors=errors,
         )
+
+
+class ESPBookerOptionsFlow(OptionsFlow):
+    """Handle options for ESP Booker."""
+
+    def __init__(self, config_entry) -> None:
+        self._config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Manage schedule options."""
+        if user_input is not None:
+            # Update the config entry data with new schedule values
+            new_data = {**self._config_entry.data, **user_input}
+            self.hass.config_entries.async_update_entry(
+                self._config_entry, data=new_data
+            )
+            await self.hass.config_entries.async_reload(self._config_entry.entry_id)
+            return self.async_create_entry(title="", data={})
+
+        current = self._config_entry.data
+        schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_BOOK_HOUR,
+                    default=current.get(CONF_BOOK_HOUR, DEFAULT_BOOK_HOUR),
+                ): vol.All(int, vol.Range(min=0, max=23)),
+                vol.Optional(
+                    CONF_BOOK_MINUTE,
+                    default=current.get(CONF_BOOK_MINUTE, DEFAULT_BOOK_MINUTE),
+                ): vol.All(int, vol.Range(min=0, max=59)),
+                vol.Optional(
+                    CONF_ADVANCE_DAYS,
+                    default=current.get(CONF_ADVANCE_DAYS, DEFAULT_ADVANCE_DAYS),
+                ): vol.All(int, vol.Range(min=1, max=14)),
+            }
+        )
+
+        return self.async_show_form(step_id="init", data_schema=schema)

@@ -21,5 +21,18 @@
     "abort": {
       "already_configured": "This account is already configured"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ESP Booker Schedule",
+        "description": "Adjust the auto-booking schedule. Times are in your HA local timezone.",
+        "data": {
+          "book_hour": "Auto-book hour (0-23)",
+          "book_minute": "Auto-book minute (0-59)",
+          "advance_days": "Days in advance to book"
+        }
+      }
+    }
   }
 }
