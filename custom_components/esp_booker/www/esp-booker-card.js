@@ -38,10 +38,11 @@ class ESPBookerCard extends HTMLElement {
     const sensors = [];
     for (const [entityId, state] of Object.entries(this._hass.states)) {
       if (
-        entityId.startsWith("sensor.esp_booker_") &&
-        !entityId.endsWith("_summary") &&
+        entityId.startsWith("sensor.") &&
         state.attributes &&
-        state.attributes.booking_id
+        state.attributes.booking_id &&
+        state.attributes.date &&
+        state.attributes.time
       ) {
         sensors.push({ entityId, ...state });
       }
@@ -63,7 +64,14 @@ class ESPBookerCard extends HTMLElement {
   _getSummary() {
     if (!this._hass) return null;
     for (const [entityId, state] of Object.entries(this._hass.states)) {
-      if (entityId.startsWith("sensor.esp_booker_") && entityId.endsWith("_summary")) {
+      if (
+        entityId.startsWith("sensor.") &&
+        state.attributes &&
+        typeof state.attributes.pending === "number" &&
+        typeof state.attributes.booked === "number" &&
+        typeof state.attributes.failed === "number" &&
+        typeof state.attributes.total === "number"
+      ) {
         return state;
       }
     }
