@@ -76,7 +76,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _register_services(hass)
 
     # ── Register Lovelace card resource ──────────────────────────────
-    await _register_frontend_card(hass)
+    try:
+        await _register_frontend_card(hass)
+    except Exception:  # noqa: BLE001
+        logger.warning("Could not register Lovelace card frontend resource")
 
     # ── Forward to platforms ─────────────────────────────────────────
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
