@@ -1,0 +1,176 @@
+# ─────────────────────────────────────────────────────────
+# ESP Booker Dashboard View
+# ─────────────────────────────────────────────────────────
+# To use: Edit your dashboard → ⋮ → Raw Configuration Editor
+# and paste this as a new view under `views:`.
+#
+# NOTE: Replace YOUR_ENTRY_ID below with your actual config
+# entry ID. You can find it by looking at your entity IDs
+# in Settings → Devices → ESP Booker (e.g. if your summary
+# sensor is sensor.abc123_summary, the entry ID is abc123).
+
+title: Padel Bookings
+path: padel-bookings
+icon: mdi:tennis
+type: sections
+max_columns: 2
+sections:
+
+  # ── COLUMN 1: Add Booking + Calendar ──────────────────
+
+  - type: grid
+    title: ""
+    cards:
+
+      # ── Add New Booking Form ──
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## 🎾 Add New Booking"
+
+          - type: entities
+            entities:
+              - entity: input_datetime.esp_booking_date
+                name: Date
+              - entity: input_datetime.esp_booking_time
+                name: Time
+              - entity: input_select.esp_booking_court
+                name: Court
+              - entity: input_select.esp_booking_duration
+                name: Duration
+              - entity: input_number.esp_booking_people
+                name: People
+
+          - type: horizontal-stack
+            cards:
+              - type: button
+                name: Schedule Booking
+                icon: mdi:calendar-plus
+                tap_action:
+                  action: perform-action
+                  perform_action: script.esp_submit_booking
+                icon_height: 40px
+              - type: button
+                name: Book Now
+                icon: mdi:lightning-bolt
+                tap_action:
+                  action: perform-action
+                  perform_action: script.esp_book_now
+                icon_height: 40px
+
+      # ── Calendar View ──
+      - type: calendar
+        title: "📅 Booking Calendar"
+        entities:
+          # Replace YOUR_ENTRY_ID with your actual entry ID
+          - calendar.esp_booker_YOUR_ENTRY_ID_calendar
+        initial_view: dayGridMonth
+
+  # ── COLUMN 2: Booking Status Lists ────────────────────
+
+  - type: grid
+    title: ""
+    cards:
+
+      # ── Bookings Summary ──
+      - type: entity
+        entity: sensor.esp_booker_YOUR_ENTRY_ID_summary
+        name: "📊 Bookings Overview"
+
+      # ── Pending Bookings ──
+      - type: entity-filter
+        card:
+          type: entities
+          title: "⏳ Pending Bookings"
+          show_header_toggle: false
+        entities:
+          # Option 1: List entities manually
+          # - sensor.esp_booker_YOUR_ENTRY_ID_abc123def456
+          #
+          # Option 2 (recommended): Install auto-entities
+          #   from HACS for automatic discovery.
+          #   See the auto-entities version below.
+          []
+        state_filter:
+          - "pending"
+
+      # ── Confirmed Bookings ──
+      - type: entity-filter
+        card:
+          type: entities
+          title: "✅ Confirmed Bookings"
+          show_header_toggle: false
+        entities: []
+        state_filter:
+          - "booked"
+
+      # ── Failed Bookings ──
+      - type: entity-filter
+        card:
+          type: entities
+          title: "❌ Failed Bookings"
+          show_header_toggle: false
+        entities: []
+        state_filter:
+          - "failed"
+
+
+# ─────────────────────────────────────────────────────────
+# RECOMMENDED ALTERNATIVE: auto-entities version
+# ─────────────────────────────────────────────────────────
+# Install "auto-entities" from HACS (Frontend → auto-entities)
+# then replace the entity-filter cards above with these,
+# which automatically discover all booking sensors:
+#
+#      # ── Pending Bookings (auto-discovery) ──
+#      - type: custom:auto-entities
+#        card:
+#          type: entities
+#          title: "⏳ Pending Bookings"
+#          show_header_toggle: false
+#        filter:
+#          include:
+#            - entity_id: sensor.esp_booker_*
+#              state: pending
+#              not:
+#                entity_id: "*_summary"
+#        show_empty: true
+#        sort:
+#          method: attribute
+#          attribute: date
+#
+#      # ── Confirmed Bookings (auto-discovery) ──
+#      - type: custom:auto-entities
+#        card:
+#          type: entities
+#          title: "✅ Confirmed Bookings"
+#          show_header_toggle: false
+#        filter:
+#          include:
+#            - entity_id: sensor.esp_booker_*
+#              state: booked
+#              not:
+#                entity_id: "*_summary"
+#        show_empty: true
+#        sort:
+#          method: attribute
+#          attribute: date
+#          reverse: true
+#
+#      # ── Failed Bookings (auto-discovery) ──
+#      - type: custom:auto-entities
+#        card:
+#          type: entities
+#          title: "❌ Failed Bookings"
+#          show_header_toggle: false
+#        filter:
+#          include:
+#            - entity_id: sensor.esp_booker_*
+#              state: failed
+#              not:
+#                entity_id: "*_summary"
+#        show_empty: true
+#        sort:
+#          method: attribute
+#          attribute: date
+#          reverse: true

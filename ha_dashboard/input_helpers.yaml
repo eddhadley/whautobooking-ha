@@ -1,0 +1,48 @@
+# ─────────────────────────────────────────────────────────
+# Input Helpers for the ESP Booker "Add Booking" form
+# ─────────────────────────────────────────────────────────
+# Option A: Paste into your configuration.yaml
+# Option B: Create these manually via Settings → Devices & Services → Helpers
+#
+# If using Option A, add these top-level sections to configuration.yaml:
+
+input_datetime:
+  esp_booking_date:
+    name: Booking Date
+    has_date: true
+    has_time: false
+    icon: mdi:calendar
+  esp_booking_time:
+    name: Booking Time
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+
+input_select:
+  esp_booking_court:
+    name: Court
+    options:
+      - PADEL01
+      - PADEL02
+      - PADEL03
+    initial: PADEL02
+    icon: mdi:tennis
+  esp_booking_duration:
+    name: Duration (mins)
+    options:
+      - "30"
+      - "60"
+      - "90"
+      - "120"
+    initial: "60"
+    icon: mdi:timer-outline
+
+input_number:
+  esp_booking_people:
+    name: Number of People
+    min: 1
+    max: 8
+    step: 1
+    initial: 1
+    mode: slider
+    icon: mdi:account-group
