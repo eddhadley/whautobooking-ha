@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ESP Elite Live Credentials",
+        "description": "Enter your ESP Elite Live login details and scheduling preferences.",
+        "data": {
+          "club_id": "Club ID",
+          "username": "Username",
+          "password": "Password",
+          "book_hour": "Auto-book hour (UTC, 0-23)",
+          "book_minute": "Auto-book minute (0-59)",
+          "advance_days": "Days in advance to book"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "cannot_connect": "Cannot connect to ESP Elite Live"
+    },
+    "abort": {
+      "already_configured": "This account is already configured"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+add_booking:
+  name: Add Booking
+  description: Schedule a new court booking
+  fields:
+    date:
+      name: Date
+      description: Booking date in dd/MM/yy format (e.g. 20/04/26)
+      required: true
+      example: "20/04/26"
+      selector:
+        text:
+    time:
+      name: Time
+      description: Slot start time in HH:MM format
+      required: true
+      example: "09:00"
+      selector:
+        text:
+    court:
+      name: Court
+      description: Court location code
+      required: false
+      default: "PADEL02"
+      selector:
+        select:
+          options:
+            - "PADEL01"
+            - "PADEL02"
+            - "PADEL03"
+    duration_mins:
+      name: Duration (minutes)
+      description: Booking duration in minutes
+      required: false
+      default: 60
+      selector:
+        number:
+          min: 30
+          max: 120
+          step: 30
+    num_people:
+      name: Number of People
+      description: Number of people for the booking
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 8
+    category:
+      name: Category
+      description: Booking category
+      required: false
+      default: "Padel"
+      selector:
+        text:
+    group:
+      name: Group
+      description: Group code
+      required: false
+      default: "V_Padel"
+      selector:
+        text:
+    group_desc:
+      name: Group Description
+      description: Group description
+      required: false
+      default: "Book Padel Courts"
+      selector:
+        text:
+    activity:
+      name: Activity
+      description: Activity code
+      required: false
+      default: "PADEL60"
+      selector:
+        text:
+    activity_desc:
+      name: Activity Description
+      description: Activity description
+      required: false
+      default: "Padel 60 Mins"
+      selector:
+        text:
+    activity_type:
+      name: Activity Type
+      description: Activity type code
+      required: false
+      default: "A"
+      selector:
+        text:
+    location_type:
+      name: Location Type
+      description: Location type
+      required: false
+      default: "Padel"
+      selector:
+        text:
+    export_id:
+      name: Export ID
+      description: ESP export ID
+      required: false
+      default: "000093"
+      selector:
+        text:
+
+remove_booking:
+  name: Remove Booking
+  description: Remove a planned booking by its ID
+  fields:
+    booking_id:
+      name: Booking ID
+      description: The unique booking identifier
+      required: true
+      selector:
+        text:
+
+retry_booking:
+  name: Retry Booking
+  description: Reset a failed booking to pending so it will be retried
+  fields:
+    booking_id:
+      name: Booking ID
+      description: The unique booking identifier to retry
+      required: true
+      selector:
+        text:
+
+book_now:
+  name: Book Now
+  description: Trigger the booking run immediately for a specific date (or the default target date)
+  fields:
+    date:
+      name: Date
+      description: Target date in dd/MM/yy format. Defaults to today + advance_days.
+      required: false
+      selector:
+        text:
