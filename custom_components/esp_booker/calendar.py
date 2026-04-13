@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
+from homeassistant.util import dt as dt_util
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -43,7 +44,7 @@ class ESPBookerCalendar(CoordinatorEntity, CalendarEntity):
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event (used for the entity state)."""
         events = self._build_events()
-        now = datetime.utcnow()
+        now = dt_util.now()
         future = [e for e in events if e.end > now]
         return future[0] if future else None
 
@@ -77,7 +78,8 @@ def _booking_to_event(booking: dict[str, Any]) -> CalendarEvent | None:
 
     try:
         # date_str is dd/MM/yy
-        start = datetime.strptime(f"{date_str} {time_str}", "%d/%m/%y %H:%M")
+        start_naive = datetime.strptime(f"{date_str} {time_str}", "%d/%m/%y %H:%M")
+        start = start_naive.replace(tzinfo=dt_util.get_default_time_zone())
     except ValueError:
         return None
 
