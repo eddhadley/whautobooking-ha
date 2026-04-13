@@ -7,6 +7,7 @@ via ESP Elite Live, N days in advance.
 from __future__ import annotations
 
 import logging
+import shutil
 from pathlib import Path
 
 from homeassistant.config_entries import ConfigEntry
@@ -76,7 +77,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _register_services(hass)
 
     # ── Register Lovelace card resource ──────────────────────────────
-    _register_frontend_card(hass)
+    await _register_frontend_card(hass)
 
     # ── Forward to platforms ─────────────────────────────────────────
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -164,20 +165,17 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(DOMAIN, "book_now", _handle_book_now)
 
 
-def _register_frontend_card(hass: HomeAssistant) -> None:
-    """Register the custom Lovelace card JS as a frontend resource."""
+async def _register_frontend_card(hass: HomeAssistant) -> None:
+    """Copy the Lovelace card JS to www/ and register it as a resource."""
+    src = Path(__file__).parent / "www" / "esp-booker-card.js"
+    dst_dir = Path(hass.config.path("www"))
+    dst = dst_dir / "esp-booker-card.js"
+
+    # Ensure www/ directory exists and copy the JS file
+    dst_dir.mkdir(exist_ok=True)
+    await hass.async_add_executor_job(shutil.copy2, str(src), str(dst))
+
+    # Register as a Lovelace resource so HA loads it
+    url = "/local/esp-booker-card.js"
     from homeassistant.components.frontend import add_extra_js_url
-    from homeassistant.components.http import StaticPathConfig
-
-    url = "/esp_booker/esp-booker-card.js"
-    path = str(Path(__file__).parent / "www" / "esp-booker-card.js")
-
-    # Serve the JS file from the www folder
-    hass.async_create_task(
-        hass.http.async_register_static_paths(
-            [StaticPathConfig(url, path, cache_headers=False)]
-        )
-    )
-
-    # Auto-load the JS in the frontend
     add_extra_js_url(hass, url)
