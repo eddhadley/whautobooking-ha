@@ -33,7 +33,7 @@ A Home Assistant custom integration that automatically books padel courts (or ot
    - **Username** — your ESP login
    - **Password** — your ESP password
    - **Auto-book hour (UTC)** — hour to run auto-booking (default: 7)
-   - **Auto-book minute** — minute to run auto-booking (default: 2)
+   - **Auto-book minute** — minute to run auto-booking (default: 0; runs at HH:MM:05)
    - **Days in advance** — how far ahead to book (default: 7)
 
 Your credentials are stored encrypted in Home Assistant's config entries.

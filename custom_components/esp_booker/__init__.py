@@ -21,6 +21,7 @@ from .const import (
     CONF_ADVANCE_DAYS,
     DEFAULT_BOOK_HOUR,
     DEFAULT_BOOK_MINUTE,
+    DEFAULT_BOOK_SECOND,
     DEFAULT_ADVANCE_DAYS,
     DEFAULT_CATEGORY,
     DEFAULT_GROUP,
@@ -68,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await coordinator.async_run_bookings_for_date(target_date)
 
     unsub = async_track_time_change(
-        hass, _daily_auto_book, hour=book_hour, minute=book_minute, second=0
+        hass, _daily_auto_book, hour=book_hour, minute=book_minute, second=DEFAULT_BOOK_SECOND
     )
     hass.data[DOMAIN][entry.entry_id]["unsub_timer"] = unsub
 
